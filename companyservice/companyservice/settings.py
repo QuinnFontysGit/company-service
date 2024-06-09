@@ -116,6 +116,10 @@ DATABASES = {
         'PASSWORD': os.environ.get('DB_PASS'),
         'HOST': 'companydb',
         'PORT': '3306'
+    },
+    'test': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
     }
 }
 
