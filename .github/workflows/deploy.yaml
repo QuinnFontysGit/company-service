@@ -20,12 +20,14 @@ jobs:
 
     - name: Install dependencies
       run: |
+        cd companyservice
         python -m venv venv
         source venv/bin/activate
-        pip install -r companyservice/requirements.txt
+        pip install -r requirements.txt
 
     - name: Run tests
       run: |
+        cd companyservice
         source venv/bin/activate
         python manage.py test companyservice
 
@@ -41,6 +43,7 @@ jobs:
 
     - name: Build and push Docker image
       run: |
+        cd companyservice
         docker build -t individualsem6.azurecr.io/companybackend:latest .
         docker push individualsem6.azurecr.io/companybackend:latest
 
@@ -67,5 +70,6 @@ jobs:
 
     - name: Deploy to AKS
       run: |
-        kubectl apply -f companyservice/kubernetes/deployment.yaml
-        kubectl apply -f companyservice/kubernetes/service.yaml
+        cd companyservice
+        kubectl apply -f kubernetes/deployment.yaml
+        kubectl apply -f kubernetes/service.yaml
