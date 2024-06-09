@@ -1,0 +1,106 @@
+apiVersion: v1
+data:
+  .env: |-
+    SECRET_KEY=django-insecure-$2oa+3+b&91t+a4_xl66qa-w==8welp$rbf5^nsouz@8j0a#3r
+    DB_NAME=individualcompanydb
+    DB_USER=quinncompanies
+    DB_PASS=companypass
+  Dockerfile: |-
+    FROM python:3.9-slim-buster
+
+    ENV PYTHONDONTWRITEBYTECODE 1
+    ENV PYTHONUNBUFFERED 1
+
+    WORKDIR /app
+
+    COPY . /app/
+
+    RUN apt-get update && \
+        apt-get install -y --no-install-recommends \
+        build-essential \
+        pkg-config \
+        default-libmysqlclient-dev \
+        libpq-dev \
+        && rm -rf /var/lib/apt/lists/*
+    RUN pip install --upgrade pip
+    RUN pip install -r requirements.txt
+
+    EXPOSE 8030
+  check_db.py: |-
+    import socket
+    import time
+    import argparse
+
+
+    """
+    This script is used during docker startup to wait for SQL database to start.
+    Check if SQL database port is open to avoid docker-compose race condition.
+    """
+
+    parser = argparse.ArgumentParser(description='Check if port is open, avoid\
+                                     docker-compose race condition')
+    parser.add_argument('--service-name', required=True)
+    parser.add_argument('--ip', required=True)
+    parser.add_argument('--port', required=True)
+
+    args = parser.parse_args()
+
+    # Get arguments
+    service_name = str(args.service_name)
+    port = int(args.port)
+    ip = str(args.ip)
+
+    # Infinite loop
+    while True:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        result = sock.connect_ex((ip, port))
+        if result == 0:
+            print(f"{service_name}, {ip}:{port} is open! Bye!")
+            break
+        else:
+            print(f"{service_name}, {ip}:{port} is not open! I'll check it soon!")
+            time.sleep(3)
+  compose.yaml: "services:\n  companydb:\n    image: mariadb:10.9\n    container_name: companydb\n    environment:\n      MYSQL_ROOT_PASSWORD: companypass\n      MYSQL_DATABASE: individualcompanydb\n      MYSQL_USER: quinncompanies\n      MYSQL_PASSWORD: companypass\n      MYSQL_HOST: companydb\n      MYSQL_PORT: 3306\n    networks:\n      - company-net\n    ports:\n      - \"3302:3306\"\n    \n  companybackend:\n    build: .\n    container_name: companybackend\n    image: individualsem6.azurecr.io/companybackend:latest\n    command: bash -c \"python check_db.py --service-name companydb --ip companydb --port 3306 && python manage.py runserver 0.0.0.0:8030\"\n    volumes:\n      - .:/app\n    ports:\n      - \"8030:8030\"\n    networks:\n      - company-net\n    depends_on:\n      - companydb\nnetworks:\n  company-net:\n    driver: bridge"
+  db.sqlite3: ""
+  manage.py: |
+    #!/usr/bin/env python
+    """Django's command-line utility for administrative tasks."""
+    import os
+    import sys
+
+
+    def main():
+        """Run administrative tasks."""
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'companyservice.settings')
+        try:
+            from django.core.management import execute_from_command_line
+        except ImportError as exc:
+            raise ImportError(
+                "Couldn't import Django. Are you sure it's installed and "
+                "available on your PYTHONPATH environment variable? Did you "
+                "forget to activate a virtual environment?"
+            ) from exc
+        execute_from_command_line(sys.argv)
+
+
+    if __name__ == '__main__':
+        main()
+  requirements.txt: |-
+    asgiref==3.8.1
+    Django==4.2.13
+    djangorestframework==3.15.1
+    mysqlclient==2.2.4
+    sqlparse==0.5.0
+    tzdata==2024.1
+    cryptography~=42.0.7
+    django-cors-headers~=4.1.0
+    drf-jwt~=1.13.3
+    pyjwt~=1.7.1
+    requests~=2.22.0
+    python-dotenv==1.0.1
+    pika==1.2.0
+kind: ConfigMap
+metadata:
+  labels:
+    io.kompose.service: companybackend
+  name: companybackend-cm0

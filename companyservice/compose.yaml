@@ -1,0 +1,32 @@
+services:
+  companydb:
+    image: mariadb:10.9
+    container_name: companydb
+    environment:
+      MYSQL_ROOT_PASSWORD: companypass
+      MYSQL_DATABASE: individualcompanydb
+      MYSQL_USER: quinncompanies
+      MYSQL_PASSWORD: companypass
+      MYSQL_HOST: companydb
+      MYSQL_PORT: 3306
+    networks:
+      - company-net
+    ports:
+      - "3302:3306"
+    
+  companybackend:
+    build: .
+    container_name: companybackend
+    image: individualsem6.azurecr.io/companybackend:latest
+    command: bash -c "python check_db.py --service-name companydb --ip companydb --port 3306 && python manage.py runserver 0.0.0.0:8030"
+    volumes:
+      - .:/app
+    ports:
+      - "8030:8030"
+    networks:
+      - company-net
+    depends_on:
+      - companydb
+networks:
+  company-net:
+    driver: bridge
