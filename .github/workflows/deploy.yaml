@@ -74,5 +74,6 @@ jobs:
     - name: Deploy to AKS
       run: |
         cd companyservice
-        kubectl apply -f kubernetes/deployment.yaml
-        kubectl apply -f kubernetes/service.yaml
+        kubectl apply -f kubernetes/companybackend-cm0-configmap.yaml
+        kubectl apply -f kubernetes/companybackend-deployment.yaml
+        kubectl apply -f kubernetes/companybackend-service.yaml
