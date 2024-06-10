@@ -40,8 +40,8 @@ jobs:
       uses: azure/docker-login@v1
       with:
         login-server: individualsem6.azurecr.io
-        username: ${{ secrets.ACR_USERNAME }}
-        password: ${{ secrets.ACR_PASSWORD }}
+        username: ${{ secrets.AZURE_CREDENTIALS.clientId }}
+        password: ${{ secrets.AZURE_CREDENTIALS.clientSecret }}
 
     - name: Build and push Docker image
       run: |
