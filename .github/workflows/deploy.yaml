@@ -37,9 +37,9 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Log in to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      run: |
+        az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
 
     - name: Log in to Azure Container Registry
       run: az acr login --name individualsem6
