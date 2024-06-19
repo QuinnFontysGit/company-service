@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets, status
+from rest_framework.views import APIView
+from rest_framework.parsers import JSONParser
+import requests
 import pika
 
 
@@ -60,3 +63,18 @@ class CompanyViewSet(viewsets.ModelViewSet):
 
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@permission_classes([AllowAny])
+class EmailView(APIView):
+    parser_classes=[JSONParser]
+
+    def post(self, request):
+        name = request.data.get('name', 'Quinn')
+        email = request.data.get('email', '442982@student.fontys.nl')
+        function_url = f"https://linkedtindermailingfunction.azurewebsites.net/api/mailfunction?name={name}&email={email}"
+        response = requests.get(function_url)
+
+        if response.status_code == 200:
+            return Response({"message": response.text}, status=status.HTTP_200_OK)
+        else:
+            return Response(response.text, status=response.status_code)
