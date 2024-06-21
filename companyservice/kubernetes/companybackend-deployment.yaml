@@ -32,6 +32,9 @@ spec:
           ports:
             - containerPort: 8030
               protocol: TCP
+          envFrom:
+          - configMapRef:
+            name: companybackend-cm0
           volumeMounts:
             - mountPath: /app/config
               name: companybackend-cm0
