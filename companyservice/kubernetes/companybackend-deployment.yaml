@@ -33,7 +33,7 @@ spec:
             - containerPort: 8030
               protocol: TCP
           volumeMounts:
-            - mountPath: /app
+            - mountPath: /app/config
               name: companybackend-cm0
       restartPolicy: Always
       volumes:
