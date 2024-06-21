@@ -9,8 +9,8 @@ metadata:
   name: companydb
 spec:
   ports:
-    - name: "3302"
-      port: 3302
+    - name: "3306"
+      port: 3306
       targetPort: 3306
   selector:
     io.kompose.service: companydb
