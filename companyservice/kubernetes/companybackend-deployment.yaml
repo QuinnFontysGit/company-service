@@ -34,7 +34,7 @@ spec:
               protocol: TCP
           envFrom:
           - configMapRef:
-            name: companybackend-cm0
+              name: companybackend-cm0
           volumeMounts:
             - mountPath: /app/config
               name: companybackend-cm0
