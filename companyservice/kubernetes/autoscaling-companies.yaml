@@ -35,7 +35,7 @@ spec:
     kind: Deployment
     name: companybackend
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 2
   metrics:
     - type: Resource
       resource:

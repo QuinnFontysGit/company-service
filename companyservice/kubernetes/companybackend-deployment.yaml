@@ -26,9 +26,16 @@ spec:
         - args:
             - bash
             - -c
-            - python check_db.py --service-name companydb --ip companydb --port 3306 && python manage.py runserver 0.0.0.0:8030
+            - python check_db.py --service-name companydb --ip companydb --port 3306 && python manage.py migrate && python manage.py runserver 0.0.0.0:8030 
           image: individualsem6.azurecr.io/companybackend:latest
           name: companybackend
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 200m
+              memory: 512Mi
           ports:
             - containerPort: 8030
               protocol: TCP
